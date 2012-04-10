@@ -44,6 +44,10 @@ public class TCPMessageHandler {
 		 * Project 2 will replace this dummy implementation with a real one
 		 ******************************************************************/
 		byte buf[] = new byte[4];
+		buf[3] = (byte) ((i & 0xFF000000L) >> 24);
+		buf[2] = (byte) ((i & 0x00FF0000L) >> 16);
+		buf[1] = (byte) ((i & 0x0000FF00L) >> 8);
+		buf[0] = (byte)  (i & 0x000000FFL);
 		return buf;
 	}
 	
