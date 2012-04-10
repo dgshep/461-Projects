@@ -86,15 +86,40 @@ public class TCPMessageHandler {
 	 * Project 2 will implement these methods
 	 ******************************************************************/
 	public void sendMessage(byte[] buf) throws IOException {
+		int length = buf.length;
+		
+		
 	}
 	
 	public void sendMessage(String str) throws IOException {
+		int length = str.length();
+		char[] string = str.toCharArray();
+		byte[] payload = new byte[string.length];
+		for(int i = 0; i < string.length; i++){
+			payload[i] = (byte) string[i];
+		}
+		sendPacket(length, payload);
 	}
 	
 	public void sendMesssage(JSONArray jsArray) throws IOException {
+		
 	}
 	
 	public void sendMessage(JSONObject jsObject) throws IOException {
+		
+	}
+	
+	private void sendPacket(int length, byte[] payload) throws IOException {
+		byte[] header = intToByte(length);
+		byte[] packet = new byte[(length + 4)];
+		for(int i = 0; i < 4; i++){
+			packet[i] = header[i]; //set header
+		}
+		for(int i = 0; i < length; i++){
+			packet[i+4] = (byte) payload[i]; //set payload
+		}
+		mOS.write(packet); //send
+		mOS.flush();
 	}
 	
 	//--------------------------------------------------------------------------------------
