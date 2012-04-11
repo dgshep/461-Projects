@@ -40,9 +40,7 @@ public class TCPMessageHandler {
 	 * @return A byte[4] encoding the integer argument.
 	 */
 	protected static byte[] intToByte(int i) {
-		/*****************************************************************
-		 * Project 2 will replace this dummy implementation with a real one
-		 ******************************************************************/
+		
 		byte buf[] = new byte[4];
 		buf[3] = (byte) ((i & 0xFF000000L) >> 24);
 		buf[2] = (byte) ((i & 0x00FF0000L) >> 16);
@@ -87,26 +85,32 @@ public class TCPMessageHandler {
 	 ******************************************************************/
 	public void sendMessage(byte[] buf) throws IOException {
 		int length = buf.length;
-		
-		
+		sendPacket(length, buf);	
 	}
 	
 	public void sendMessage(String str) throws IOException {
-		int length = str.length();
-		char[] string = str.toCharArray();
-		byte[] payload = new byte[string.length];
-		for(int i = 0; i < string.length; i++){
-			payload[i] = (byte) string[i];
-		}
-		sendPacket(length, payload);
+		byte[] payload = stringToByte(str);
+		sendMessage(payload);
 	}
 	
 	public void sendMesssage(JSONArray jsArray) throws IOException {
-		
+		String payload = jsArray.toString();
+		sendMessage(payload);
 	}
 	
 	public void sendMessage(JSONObject jsObject) throws IOException {
-		
+		String payload = jsObject.toString();
+		sendMessage(payload);
+	}
+	
+	private byte[] stringToByte(String s) {
+		int length = s.length();
+		char[] string = s.toCharArray();
+		byte[] payload = new byte[length];
+		for(int i = 0; i < length; i++){
+			payload[i] = (byte) string[i];
+		}
+		return payload;
 	}
 	
 	private void sendPacket(int length, byte[] payload) throws IOException {
