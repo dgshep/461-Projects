@@ -10,6 +10,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONStringer;
 
 import edu.uw.cs.cse461.sp12.util.TCPMessageHandler;
@@ -220,6 +221,11 @@ public class Client {
 				/*****************************************************************
 				 * Project 2 will fill in code here
 				 ******************************************************************/
+				JSONObject rate = new JSONObject();
+				try {
+					rate.put("intersymboltime", interSymbolTime);
+				} catch (JSONException e) {}
+				msgHandler.sendMessage(rate);
 			}
 
 			mTimer = new Timer();
