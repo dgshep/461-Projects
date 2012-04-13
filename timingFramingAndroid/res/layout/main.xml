@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+<LinearLayout android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
@@ -100,7 +99,26 @@
             android:layout_below="@+id/textView3"
             android:hint="@string/portHint"
             android:inputType="number|textNoSuggestions" />
-        
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/portText"
+            android:text="Inter-Character Time (msec.)"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/interText"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/portText"
+            android:layout_below="@+id/textView4"
+            android:ems="10"
+            android:hint="Enter time"
+            android:inputType="number" />
         
     </RelativeLayout>
 

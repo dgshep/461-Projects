@@ -59,15 +59,19 @@ public class TimingFramingAndroidActivity extends Activity implements Client.Cli
     private boolean readUserInputs() {
         mServerHost = ((TextView)findViewById(R.id.hostText)).getText().toString();
         mServerPort = Integer.parseInt(((TextView)findViewById(R.id.portText)).getText().toString());
-        try {
-        	mServerInterSymbolTime = mClient.portToIntersymbolTime(mServerPort, Properties.SERVER_INTER_SYMBOL_TIME);
-        } catch (Exception e) {
-        	// display a fleeting error message
-    		Toast toast = Toast.makeText(getApplicationContext(), "Valid port numbers are " + Properties.SERVER_PORT_NEGOTIATE + "-" + 
-    							(Properties.SERVER_PORT_NEGOTIATE + Properties.SERVER_PORT_INTERSYMBOL_TIME_VEC.length), Toast.LENGTH_LONG);
-    		toast.show();
-    		return false;
-    	}
+        if(mServerPort != 46100){
+	        try {
+	        	mServerInterSymbolTime = mClient.portToIntersymbolTime(mServerPort, Properties.SERVER_INTER_SYMBOL_TIME);
+	        } catch (Exception e) {
+	        	// display a fleeting error message
+	    		Toast toast = Toast.makeText(getApplicationContext(), "Valid port numbers are " + Properties.SERVER_PORT_NEGOTIATE + "-" + 
+	    							(Properties.SERVER_PORT_NEGOTIATE + Properties.SERVER_PORT_INTERSYMBOL_TIME_VEC.length), Toast.LENGTH_LONG);
+	    		toast.show();
+	    		return false;
+	    	}
+        } else{
+        	mServerInterSymbolTime = Integer.parseInt(((TextView)findViewById(R.id.interText)).getText().toString());
+        }
     	return true;
     }
     
@@ -150,7 +154,7 @@ public class TimingFramingAndroidActivity extends Activity implements Client.Cli
     /**
      * Callback from Client object when a character is read, synchronously or asynchronously.
      */
-    @Override
+    //@Override
 	public void onChar(int type, char c) {
 		runOnUiThread( new OnCharClass(type, c, this.mClient) );
 	}
