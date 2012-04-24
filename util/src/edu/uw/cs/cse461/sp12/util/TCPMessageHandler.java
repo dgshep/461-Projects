@@ -12,8 +12,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 /**
- * Sends/recieves a message over an established TCP connection.
+ * Sends/receives a message over an established TCP connection.
  * To be a message means the unit of write/read is demarcated in some way.
  * In this implementation, that's done by prefixing the data with a 4-byte
  * length field.
@@ -24,6 +25,8 @@ import org.json.JSONObject;
  *
  */
 public class TCPMessageHandler {
+	private static final String TAG="TCPMessageHandler";
+	
 	protected Socket mSock;
 	protected InputStream mIS;
 	protected OutputStream mOS;
@@ -40,12 +43,10 @@ public class TCPMessageHandler {
 	 * @return A byte[4] encoding the integer argument.
 	 */
 	protected static byte[] intToByte(int i) {
-		
-		byte buf[] = new byte[4];
-		buf[3] = (byte) ((i & 0xFF000000L) >> 24);
-		buf[2] = (byte) ((i & 0x00FF0000L) >> 16);
-		buf[1] = (byte) ((i & 0x0000FF00L) >> 8);
-		buf[0] = (byte)  (i & 0x000000FFL);
+		ByteBuffer b = ByteBuffer.allocate(4);
+		b.order(ByteOrder.LITTLE_ENDIAN);
+		b.putInt(i);
+		byte buf[] = b.array();
 		return buf;
 	}
 	
@@ -76,54 +77,41 @@ public class TCPMessageHandler {
 		mOS = sock.getOutputStream();
 	}
 	
+	/**
+	 * Closes the underlying socket and associated streams.  The TCPMessageHandler object is 
+	 * unusable after execution of this method.
+	 */
+	public void discard() {
+		try {
+			if ( mIS != null ) mIS.close();
+			mIS = null;
+			if ( mOS != null ) mOS.close();
+			mOS = null;
+			if ( mSock != null ) mSock.close();
+			mSock = null;
+		} catch (Exception e) {}
+	}
+	
 	//--------------------------------------------------------------------------------------
 	// send routines
 	//--------------------------------------------------------------------------------------
-
-	/*****************************************************************
-	 * Project 2 will implement these methods
-	 ******************************************************************/
+	
 	public void sendMessage(byte[] buf) throws IOException {
-		int length = buf.length;
-		sendPacket(length, buf);	
+		mOS.write( intToByte(buf.length) );
+		mOS.write( buf );
+		mOS.flush();
 	}
 	
 	public void sendMessage(String str) throws IOException {
-		byte[] payload = stringToByte(str);
-		sendMessage(payload);
+		sendMessage(str.getBytes());
 	}
 	
 	public void sendMesssage(JSONArray jsArray) throws IOException {
-		String payload = jsArray.toString();
-		sendMessage(payload);
+		sendMessage(jsArray.toString());
 	}
 	
 	public void sendMessage(JSONObject jsObject) throws IOException {
-		String payload = jsObject.toString();
-		sendMessage(payload);
-	}
-	
-	private byte[] stringToByte(String s) {
-		int length = s.length();
-		char[] string = s.toCharArray();
-		byte[] payload = new byte[length];
-		for(int i = 0; i < length; i++){
-			payload[i] = (byte) string[i];
-		}
-		return payload;
-	}
-	
-	private void sendPacket(int length, byte[] payload) throws IOException {
-		byte[] header = intToByte(length);
-		byte[] packet = new byte[(length + 4)];
-		for(int i = 0; i < 4; i++){
-			packet[i] = header[i]; //set header
-		}
-		for(int i = 0; i < length; i++){
-			packet[i+4] = (byte) payload[i]; //set payload
-		}
-		mOS.write(packet); //send
-		mOS.flush();
+		sendMessage(jsObject.toString());
 	}
 	
 	//--------------------------------------------------------------------------------------
@@ -161,28 +149,32 @@ public class TCPMessageHandler {
 	protected byte[] readFromStream(int nBytes) throws IOException {
 		// debug ----------
 		if ( nBytes == 0 ) {
-			System.out.println("TCPMessageHandler.readFromStream: length 0 read requested"); // place to set breakpoint
+			Log.e(TAG, "readFromStream: length 0 read requested"); // place to set breakpoint
 			throw new IOException("TCPMessageHandler.readFromStream: read of zero bytes requested");
 		}
 		// debug ----------
 		byte[] buf = new byte[nBytes];
 		int totalRead = 0;
-		while ( totalRead < nBytes) {
-			int nRead = mIS.read(buf, totalRead, nBytes-totalRead);
-			if ( nRead < 0 ) {
-				if ( totalRead == 0 ) throw new EOFException("EOF reached");
-				throw new IOException("TCPMessageHandler.readFromStream: EOF reached after " + totalRead + " bytes, but " + nBytes + " requested");
+		try {
+			while ( totalRead < nBytes) {
+				int nRead = mIS.read(buf, totalRead, nBytes-totalRead);
+				if ( nRead < 0 ) {
+					if ( totalRead == 0 ) throw new EOFException("EOF reached");
+					throw new IOException("TCPMessageHandler.readFromStream: EOF reached after " + totalRead + " bytes, but " + nBytes + " requested");
+				}
+				// debug ----------
+				if ( nRead == 0 ) {
+					Log.e(TAG, "readFromStream: read returned 0"); // place to set breakpoint -- under what conditions does this happen?
+					throw new IOException("Read zero bytes!");  // don't go into infinite loop!
+				}
+				// debug ----------
+				totalRead += nRead;
 			}
-			// debug ----------
-			if ( nRead == 0 ) {
-				System.out.println("TCPMessageHandler.readFromStream: read returned 0"); // place to set breakpoint -- under what conditions does this happen?
-				throw new IOException("Read zero bytes!");  // don't go into infinite loop!
-			}
-			// debug ----------
-			totalRead += nRead;
+		} catch (java.net.SocketTimeoutException e) {
+			// timed out.  May have a partial message, but that's worthless...
+			throw new IOException("Timed out after reading " + totalRead + " bytes");
 		}
 		return buf;
 	}
-		
-
+	
 }

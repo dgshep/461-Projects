@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="lib/util.jar"/>
+    <jar path="/hddhome/zahorjan/courses/cse461/12sp/projectFiles/solutionFiles/lib/util.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/util/util.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
@@ -10,9 +10,9 @@
             <packagesToUnSeal/>
         </sealing>
     </manifest>
-    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=util/src"/>
-        <file path="/util/.project"/>
         <file path="/util/.classpath"/>
+        <file path="/util/.project"/>
     </selectedElements>
 </jardesc>
