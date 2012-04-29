@@ -8,6 +8,9 @@ import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
+
+import edu.uw.cs.cse461.sp12.OS.RPCCallable.RPCCallableMethod;
 
 
 /**
@@ -16,9 +19,11 @@ import java.net.Socket;
 public class ServerConnection implements Runnable {
 
 	private ServerSocket connection;
+	private Map<String, RPCCallableMethod> callbacks;
 	
-	public ServerConnection(ServerSocket connection) {
+	public ServerConnection(ServerSocket connection, Map<String, RPCCallableMethod> callbacks) {
 		this.connection = connection;
+		this.callbacks = callbacks;
 	}
 	
 	@Override
@@ -27,7 +32,7 @@ public class ServerConnection implements Runnable {
 		while(!connection.isClosed()) {
 			try {
 				Socket newUser = connection.accept();
-				UserConnection thread = new UserConnection(newUser);
+				UserConnection thread = new UserConnection(newUser, callbacks);
 				thread.run();
 			} catch (IOException e) {}
 			

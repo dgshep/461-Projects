@@ -3,6 +3,7 @@ package edu.uw.cs.cse461.sp12.OS;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -54,7 +55,7 @@ public class RPCService extends RPCCallable {
 		mServerSocket.setReuseAddress(true); // allow port number to be reused immediately after close of this socket
 		mServerSocket.setSoTimeout(500); // well, we have to wake up every once and a while to check for program termination
 		
-		ServerConnection newConnection = new ServerConnection(mServerSocket);
+		ServerConnection newConnection = new ServerConnection(mServerSocket, callbacks);
 		connectionListener = new Thread(newConnection);
 		connectionListener.start();
 		//TODO: implement
@@ -66,10 +67,11 @@ public class RPCService extends RPCCallable {
 	public void shutdown() {
 		try {
 			mServerSocket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (IOException e) {}
+	}
+	
+	public Map<String, RPCCallableMethod> getHandlers() {
+		return Collections.unmodifiableMap(callbacks);
 	}
 	
 	/**
