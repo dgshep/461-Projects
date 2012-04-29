@@ -3,6 +3,7 @@ package edu.uw.cs.cse461.sp12.OS;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
+import java.util.Map;
 
 /**
  * Implements the side of RPC that receives remote invocation requests.
@@ -16,6 +17,7 @@ public class RPCService extends RPCCallable {
 	
 	private ServerSocket mServerSocket;
 	private Thread connectionListener;
+	private Map<String, RPCCallableMethod> callbacks;
 	
 	/**
 	 * This method must be implemented by RPCCallable's.  
@@ -80,6 +82,7 @@ public class RPCService extends RPCCallable {
 	 */
 	public synchronized void registerHandler(String serviceName, String methodName, RPCCallableMethod method) throws Exception {
 		//TODO: implement
+		callbacks.put(serviceName + methodName, method);
 	}
 	
 	/**
